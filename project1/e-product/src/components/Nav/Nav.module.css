@@ -1,0 +1,36 @@
+.main {
+  width: 100%;
+  height: 140px;
+  flex-direction: column;
+  background-color: rgba(247,250,252,1);
+}
+.searchArea {
+  height: 80px;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255,255,255,1);
+  gap: 150px;
+  
+}
+.searchArea .searchIcon{
+  flex: 0 0 250px;
+  gap: 30px;
+  padding-left: 30px;
+  line-height: 28px;
+  color: rgba(45,55,72,1);
+  font-size: 20px;
+}
+.searchArea .Logo{
+  font-size: 24px;
+}
+.searchArea .search{
+  min-width: 300px;
+  max-width: 600px;
+}
+
+.searchArea .searchTools{
+  flex: 0 0 250px;
+  justify-content: space-around;
+}
+
+
