@@ -1,0 +1,53 @@
+.shopContainerStyle{
+  width: 218px;
+  height: 286px;
+  border-radius: 12px 12px 12px 12px;
+  background-color: rgba(255,255,255,1);
+  border: 1px solid rgba(243,244,246,1);
+  padding: 17px 23px;
+  flex-direction: column;
+}
+.shopImgStyle{
+  background-color: pink;
+  width: 171px;
+  height: 160px;
+}
+
+.shopInfoStyle{
+  margin-top: 12px;
+}
+
+.shopNameStyle{
+  line-height: 22px;
+  color: rgba(45,55,72,1);
+  font-size: 16px;
+  text-align: justify;
+  font-family: NotoSans-regular;
+  margin-top: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shopPriceStyle{
+  margin-top: 8px;
+  width: 100%;
+  align-items: flex-end;
+}
+
+.currentPriceStyle{
+  flex-grow: 1;
+  line-height: 28px;
+  color: rgba(255,107,53,1);
+  font-size: 18px;
+  text-align: justify;
+}
+
+.originalPriceStyle{
+  flex-grow: 1;
+  line-height: 20px;
+  color: rgba(107,114,128,1);
+  font-size: 14px;
+  text-align: justify;
+  display: flex;
+  align-items: flex-end;
+}

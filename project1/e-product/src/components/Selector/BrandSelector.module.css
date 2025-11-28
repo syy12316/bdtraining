@@ -1,0 +1,42 @@
+.containerStyle{
+  flex-direction: column;
+  width: 100%;
+  padding: 30px;
+}
+
+.titleStyle{
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.categoryItemContainerStyle{
+  flex-direction: column;
+  gap: 5px;
+  padding-left: 10px;
+}
+.categoryStyle{
+  width: 100%;
+  flex-direction: column;
+}
+
+.priceInputStyle{
+  background-color: #fff;
+  flex-direction: column;
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+.priceRangeStyle{
+  padding: 10px 24px 0 24px;
+}
+
+.sliderStyle{
+  width: 100%;
+  margin: 10px auto;
+}
+.brandItemContainerStyle{
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  padding-left: 10px;
+}
