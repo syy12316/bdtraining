@@ -10,6 +10,8 @@ interface ProductsState {
   currentPage: number;
   pageSize: number;
   showAiProducts: boolean;
+  // 添加加载状态
+  loading: boolean;
 }
 
 // 模拟更多商品数据
@@ -148,6 +150,8 @@ const initialState: ProductsState = {
   currentPage: 1,
   pageSize: 10,
   showAiProducts: true,
+  // 初始加载状态为true
+  loading: true,
 }
 
 // 创建商品slice
@@ -186,6 +190,10 @@ export const productsSlice = createSlice({
     toggleAiProducts: (state) => {
       state.showAiProducts = !state.showAiProducts;
     },
+    // 设置加载状态
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.loading = action.payload;
+    },
   },
 });
 
@@ -193,10 +201,16 @@ export const productsSlice = createSlice({
 // 异步thunk用于基于筛选条件更新商品列表
 export const calculateFilteredProducts = createAsyncThunk(
   'products/calculateFilteredProducts',
-  (_, { getState, dispatch }) => {
+  async (_, { getState, dispatch }) => {
+    // 设置加载状态为true
+    dispatch(setLoading(true));
+    
     const state = getState() as RootState;
     const { realShopData } = state.products;
     const { minPrice, maxPrice, categories, brands, sortBy, searchKeyword } = state.filter;
+    
+    // 模拟网络请求延迟
+    await new Promise(resolve => setTimeout(resolve, 300));
     
     // 根据筛选条件过滤商品
     let filtered = realShopData.filter(product => {
@@ -236,6 +250,10 @@ export const calculateFilteredProducts = createAsyncThunk(
     
     // 更新筛选后的商品
     dispatch(updateFilteredProducts(filtered));
+    
+    // 设置加载状态为false
+    dispatch(setLoading(false));
+    
     return filtered;
   }
 );
@@ -246,7 +264,8 @@ export const {
   updateFilteredProducts,
   addAiShopData,
   addRealShopData,
-  toggleAiProducts
+  toggleAiProducts,
+  setLoading
 } = productsSlice.actions;
 
 // 导出reducer

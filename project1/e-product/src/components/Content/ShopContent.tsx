@@ -6,13 +6,15 @@ import { useRef, useEffect, useState } from 'react'
 import type { RootState } from '../../store'
 import { setCurrentPage, setPageSize } from '../../store/productsSlice'
 import RealShop from './RealShop'
+import RealShopSkeleton from './RealShopSkeleton'
+import AishopSkeleton from './AishopSkeleton'
 import { List } from 'react-virtualized'
 
 
 
 function ShopContent() {
   const dispatch = useDispatch()
-  const { aiShopData, filteredProducts, currentPage, pageSize, showAiProducts } = useSelector((state: RootState) => state.products)
+  const { aiShopData, filteredProducts, currentPage, pageSize, showAiProducts, loading } = useSelector((state: RootState) => state.products)
   const containerRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [listWidth, setListWidth] = useState<number>(1000)
@@ -62,11 +64,17 @@ function ShopContent() {
             </Flex>
             <Flex className={styles.shopContainerStyle} gap="16px">
               {
-                aiShopData.map((item, index) => {
-                  return (
+                loading ? (
+                  // 加载中显示骨架屏
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <AishopSkeleton key={`ai-skeleton-${index}`} />
+                  ))
+                ) : (
+                  // 加载完成显示真实数据
+                  aiShopData.map((item, index) => (
                     <Aishop key={`ai-product-${index}`} data={item} />
-                  );
-                })
+                  ))
+                )
               }
             </Flex>
           </div>
@@ -80,14 +88,18 @@ function ShopContent() {
             <List
               width={listWidth}
               height={listHeight}
-              rowCount={filteredProducts.length}
+              rowCount={loading ? 10 : filteredProducts.length} // 加载中显示10个骨架屏
               rowHeight={178} // 商品项高度
               rowRenderer={({ index, key, style }) => (
                 <div key={key} style={style} className={styles.realShopItem}>
-                  <RealShop data={filteredProducts[index]} />
+                  {loading ? (
+                    <RealShopSkeleton />
+                  ) : (
+                    <RealShop data={filteredProducts[index]} />
+                  )}
                 </div>
               )}
-              overscanRowCount={5}
+              overscanRowCount={3} // 减少预加载数量以优化性能
             />
           </div>
         </div>
