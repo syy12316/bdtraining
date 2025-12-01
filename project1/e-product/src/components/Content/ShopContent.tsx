@@ -3,8 +3,8 @@ import styles from './ShopContent.module.css'
 import { Flex, Pagination } from 'antd'
 import { useSelector, useDispatch} from 'react-redux'
 import { useRef, useEffect, useState } from 'react'
-import type { RootState } from '../../store'
-import { setCurrentPage, setPageSize } from '../../store/productsSlice'
+import type { RootState, AppDispatch } from '../../store' // 从store/index.ts导入AppDispatch
+import { setCurrentPage, setPageSize, fetchAllShopDataAsync } from '../../store/productsSlice'
 import RealShop from './RealShop'
 import RealShopSkeleton from './RealShopSkeleton'
 import AishopSkeleton from './AishopSkeleton'
@@ -13,12 +13,22 @@ import { List } from 'react-virtualized'
 
 
 function ShopContent() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const { aiShopData, filteredProducts, currentPage, pageSize, showAiProducts, loading } = useSelector((state: RootState) => state.products)
   const containerRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [listWidth, setListWidth] = useState<number>(1000)
   const [listHeight, setListHeight] = useState<number>(600)
+
+  // 计算当前页应该显示的数据
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredProducts.slice(startIndex, endIndex);
+  }
+
+  // 获取当前页的数据
+  const currentPageData = getCurrentPageData();
   
   // 处理页码变化
   const handlePageChange = (page: number) => {
@@ -49,6 +59,11 @@ function ShopContent() {
     
     return () => window.removeEventListener('resize', updateDimensions)
   }, [showAiProducts])
+  
+  // 组件挂载时获取所有商品数据
+  useEffect(() => {
+    dispatch(fetchAllShopDataAsync())
+  }, [dispatch])
   
 
 
@@ -88,14 +103,14 @@ function ShopContent() {
             <List
               width={listWidth}
               height={listHeight}
-              rowCount={loading ? 10 : filteredProducts.length} // 加载中显示10个骨架屏
+              rowCount={loading ? 10 : currentPageData.length} // 加载中显示10个骨架屏，否则显示当前页数据数量
               rowHeight={178} // 商品项高度
               rowRenderer={({ index, key, style }) => (
                 <div key={key} style={style} className={styles.realShopItem}>
                   {loading ? (
                     <RealShopSkeleton />
                   ) : (
-                    <RealShop data={filteredProducts[index]} />
+                    <RealShop data={currentPageData[index]} />
                   )}
                 </div>
               )}
