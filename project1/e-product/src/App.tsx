@@ -10,23 +10,23 @@ const { Header, Footer, Sider, Content } = Layout
 
 function App() {
   return (
-    <Flex>
-      <Layout className={styles.layoutStyle}>
-        <Header className={styles.headerStyle}>
+    <Flex key="app-container">
+      <Layout key="layout" className={styles.layoutStyle}>
+        <Header key="header" className={styles.headerStyle}>
           <Nav />
         </Header>
-        <Layout className={styles.contentLayoutStyle}>
-          <Sider width="400px" className={styles.siderStyle}>
+        <Layout key="contentLayout" className={styles.contentLayoutStyle}>
+          <Sider key="sider" width="400px" className={styles.siderStyle}>
             <BrandSelector />
           </Sider>
-          <Content className={styles.contentStyle}>
+          <Content key="content" className={styles.contentStyle}>
             <ShopContent />
           </Content>
         </Layout>
-        <Footer className={styles.footerStyle}>
+        <Footer key="footer" className={styles.footerStyle}>
           <Foot />
         </Footer>
-    </Layout>
+      </Layout>
     </Flex>
   )
 }

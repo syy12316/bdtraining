@@ -5,21 +5,21 @@ import { ShopOutlined } from '@ant-design/icons';
 function Foot() {
   return (
     <Flex className={styles.footerStyle}>
-      <Flex className={styles.footerLogo}>
-        <ShopOutlined className={styles.Logo} />
-        <div className={styles.footerLogoText}>科技生活馆 智能科技购物平台</div>
+      <Flex key="logo" className={styles.footerLogo}>
+        <ShopOutlined key="icon" className={styles.Logo} />
+        <div key="text" className={styles.footerLogoText}>科技生活馆 智能科技购物平台</div>
       </Flex>
-      <Flex className={styles.footerTool}>
-        <div className={styles.footerToolItem}>
+      <Flex key="tools" className={styles.footerTool}>
+        <div key="about" className={styles.footerToolItem}>
           关于我们
         </div>
-        <div className={styles.footerToolItem}>
+        <div key="contact" className={styles.footerToolItem}>
           联系我们
         </div>
-        <div className={styles.footerToolItem}>
+        <div key="privacy" className={styles.footerToolItem}>
           隐私政策
         </div>
-        <div className={styles.footerToolItem}>
+        <div key="help" className={styles.footerToolItem}>
           帮助中心
         </div>
       </Flex>

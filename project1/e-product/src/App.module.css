@@ -20,12 +20,16 @@
 .contentStyle {
   color: #2D3748;
   background-color: #FFF;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .siderStyle {
   text-align: center;
   color: #2D3748;
   background-color: #F7FAFC;
+  overflow-y: auto;
 }
 
 .footerStyle {

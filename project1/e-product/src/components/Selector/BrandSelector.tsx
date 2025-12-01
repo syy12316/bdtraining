@@ -1,64 +1,105 @@
-import { Flex, Slider, InputNumber, Button } from 'antd'
-import { useState } from 'react'
+import { Flex, Slider, InputNumber, Checkbox } from 'antd'
 import debounce from 'lodash/debounce'
 
 import styles from './BrandSelector.module.css'
+import { useDispatch, useSelector } from 'react-redux'
+import type { RootState, AppDispatch } from '../../store'
+import { updatePriceRange, updateCategories, updateBrands, } from '../../store/filterSlice'
+import { calculateFilteredProducts } from '../../store/productsSlice'
+
+// 价格范围常量
+const PRICE_MIN = 0;
+const PRICE_MAX = 10000;
 
 function BrandSelector() {
-  // 设置价格范围的默认值和限制
-  const [priceRange, setPriceRange] = useState([0, 10000]);
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(10000);
+  const dispatch = useDispatch<AppDispatch>()
+  const filterParams = useSelector((state: RootState) => state.filter)
   
-  // 价格范围限制
-  const PRICE_MIN = 0;
-  const PRICE_MAX = 50000;
+  // 直接从Redux store获取筛选参数，不维护本地状态
+  const { minPrice, maxPrice, categories: selectedCategories, brands: selectedBrands } = filterParams
   
-  // 处理Slider值变化 - 实时更新
-  const handleSliderChange = (value: number[]) => {
-    setPriceRange([value[0], value[1]]);
-    setMinPrice(value[0]);
-    setMaxPrice(value[1]);
-  };
+  // 分类和品牌选项
+  const categoryOptions = ['手机', '平板电脑', '笔记本电脑', '智能手表', '耳机']
+  const brandOptions = ['Apple', 'Samsung', 'Huawei', 'Xiaomi', 'OnePlus', 'Vivo', 'OPPO', 'Sony']
   
-  // 处理最小价格输入变化,做一个防抖处理,避免频繁触发
+
+  
+
+
+  // 处理滑块变化
+  const handleSliderChange = debounce((value: number[]) => {
+    // 更新Redux中的筛选条件
+    dispatch(updatePriceRange({ minPrice: value[0], maxPrice: value[1] }))
+    
+    // 使用thunk计算筛选结果
+    dispatch(calculateFilteredProducts())
+  }, 500)
+
+  // 处理最小值输入变化
   const handleMinPriceChange = debounce((value: number | null) => {
-    const newMin = value || PRICE_MIN;
-    setMinPrice(newMin);
-    setPriceRange([newMin, maxPrice]);
-  }, 300);
-  
-  // 处理最大价格输入变化,做一个防抖处理,避免频繁触发
+    const newMinPrice = value || 0
+    
+    // 更新Redux中的筛选条件
+    dispatch(updatePriceRange({ minPrice: newMinPrice, maxPrice }))
+    
+    // 使用thunk计算筛选结果
+    dispatch(calculateFilteredProducts())
+  }, 500)
+
+  // 处理最大值输入变化
   const handleMaxPriceChange = debounce((value: number | null) => {
-    const newMax = value || PRICE_MAX;
-    setMaxPrice(newMax);
-    setPriceRange([minPrice, newMax]);
-  }, 300);
+    const newMaxPrice = value || 10000
+    
+    // 更新Redux中的筛选条件
+    dispatch(updatePriceRange({ minPrice, maxPrice: newMaxPrice }))
+    
+    // 使用thunk计算筛选结果
+    dispatch(calculateFilteredProducts())
+  }, 500)
+  
+  // 处理分类选择变化
+  const handleCategoryChange = debounce((values: string[]) => {
+    // 更新Redux中的筛选条件
+    dispatch(updateCategories(values))
+    
+    // 使用thunk计算筛选结果
+    dispatch(calculateFilteredProducts())
+  }, 500)
+  
+  // 处理品牌选择变化
+  const handleBrandChange = debounce((values: string[]) => {
+    // 更新Redux中的筛选条件
+    dispatch(updateBrands(values))
+    
+    // 使用thunk计算筛选结果
+    dispatch(calculateFilteredProducts())
+  }, 500)
 
   return (
     <>
       <Flex className={styles.containerStyle} gap="16px">
-        <Flex className={styles.categoryStyle}>
+        <Flex key="category" className={styles.categoryStyle}>
           <div className={styles.titleStyle}>分类</div>
-          <Flex className={styles.categoryItemContainerStyle}>
-            <Flex justify="space-between">
-              <div className={styles.categoryItemStyle}>智能手机</div>
-              <div className={styles.itemCountStyle}>1286</div>
-            </Flex>
-            <Flex justify="space-between">
-              <div className={styles.categoryItemStyle}>笔记本</div>
-              <div className={styles.itemCountStyle}>1286</div>
-            </Flex>
-            <Flex justify="space-between">
-              <div className={styles.categoryItemStyle}>平板电脑</div>
-              <div className={styles.itemCountStyle}>1286</div>
-            </Flex>
-          </Flex>
+          <Checkbox.Group 
+            className={styles.categoryItemContainerStyle}
+            value={selectedCategories}
+            onChange={handleCategoryChange}
+          >
+            {categoryOptions.map(category => (
+              <Checkbox 
+                key={category} 
+                className={styles.checkboxItem}
+                value={category}
+              >
+                {category}
+              </Checkbox>
+            ))}
+          </Checkbox.Group>
         </Flex>
-        <Flex className={styles.categoryStyle}>
+        <Flex key="price" className={styles.categoryStyle}>
           <div className={styles.titleStyle}>价格</div>
           <Flex className={styles.priceInputStyle}>
-            <Flex justify='space-between' align="center" className={styles.priceRangeStyle}>
+            <Flex key="price-range" justify='space-between' align="center" className={styles.priceRangeStyle}>
               <InputNumber 
                 value={minPrice}
                 onChange={handleMinPriceChange}
@@ -77,7 +118,7 @@ function BrandSelector() {
             </Flex>
             <Slider 
               range={true} 
-              value={priceRange}
+              value={[minPrice, maxPrice]}
               onChange={handleSliderChange}
               min={PRICE_MIN}
               max={PRICE_MAX}
@@ -86,16 +127,25 @@ function BrandSelector() {
             />
           </Flex>
         </Flex>
-        <Flex className={styles.categoryStyle}>
+        <Flex key="brand" className={styles.categoryStyle}>
           <div className={styles.titleStyle}>品牌</div>
-          <Flex className={styles.brandItemContainerStyle}>
-            <div className={styles.brandItemStyle}>Apple</div>
-            <div className={styles.brandItemStyle}>Samsung</div>
-            <div className={styles.brandItemStyle}>Huawei</div>
-          </Flex>
+          <Checkbox.Group 
+            className={styles.brandItemContainerStyle}
+            value={selectedBrands}
+            onChange={handleBrandChange}
+          >
+            {brandOptions.map(brand => (
+              <Checkbox 
+                key={brand} 
+                className={styles.checkboxItem}
+                value={brand}
+              >
+                {brand}
+              </Checkbox>
+            ))}
+          </Checkbox.Group>
         </Flex>
       </Flex>
-      <Button type="primary" >筛选</Button>
     </>
   )
 }

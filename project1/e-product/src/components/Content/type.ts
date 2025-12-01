@@ -13,4 +13,6 @@ export interface realShopDataType {
     shopCommentCount: number,
     currentPrice: number,
     originalPrice: number,
+    category: string,
+    brand: string,
   }

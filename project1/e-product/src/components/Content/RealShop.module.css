@@ -1,0 +1,111 @@
+.realShopStyle {
+  width: 100%;
+  background-color: #ffffff;
+  padding: 25px 35px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+/* 商品图片 */
+.shopImg {
+  width: 170px;
+  height: 128px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* 商品信息区域 */
+.shopInfo {
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+/* 商品名称 */
+.shopName {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+/* 评分容器 */
+.ratingContainer {
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+/* 评分文字 */
+.scoreText {
+  color: #ff4757;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* 评论数 */
+.commentCount {
+  color: #666;
+  font-size: 14px;
+}
+
+/* 商品详情 */
+.shopDetails {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+/* 销量信息 */
+.salesInfo {
+  color: #999;
+  font-size: 14px;
+}
+
+/* 价格和操作按钮区域 */
+.priceAndActions {
+  min-width: 200px;
+  flex-direction: column;
+}
+
+/* 价格容器 */
+.priceContainer {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* 当前价格 */
+.currentPrice {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff4757;
+}
+
+/* 原价 */
+.originalPrice {
+  font-size: 16px;
+  color: #999;
+  text-decoration: line-through;
+  margin-top: 4px;
+}
+
+/* 操作按钮 */
+.actions {
+  margin-top: 10px;
+}
+
+/* 收藏按钮 */
+.collectButton {
+  border-color: #ddd;
+  color: #666;
+}
+
+/* 加入购物车按钮 */
+.addToCartButton {
+  background-color: #ff4757;
+  border-color: #ff4757;
+}

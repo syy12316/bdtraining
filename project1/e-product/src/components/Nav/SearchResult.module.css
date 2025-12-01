@@ -5,10 +5,12 @@
 .searchResult {
   font-size: 16px;
   line-height: 24px;
-  height: 60px;
+  min-height: 60px;
   align-items: center;
   background-color: rgba(247,250,252,1);
-  padding-left: 30px;
+  padding: 15px 30px;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .searchResult p {
@@ -16,19 +18,42 @@
 }
 
 .closeIcon {
-  margin-left: 20px;
-  font-size: 14px;
+  margin-left: 12px;
+  font-size: 16px;
+  color: #999;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.closeIcon:hover {
+  color: #4096ff;
 }
 
 .searchResultCard {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 24px;
-  height: 30px;
+  height: 32px;
   align-items: center;
-  padding: 0 20px;
-  border-radius: 20px;
-  background-color: rgba(247,250,252,1);
+  padding: 0 16px;
+  border-radius: 16px;
+  background-color: white;
   border: 1px solid rgba(226,232,240,1);
+  transition: all 0.2s ease;
+}
+
+.searchResultCard:hover {
+  border-color: #4096ff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.searchResultCard > div:first-child {
+  font-weight: 500;
+  margin-right: 8px;
+  color: #666;
+}
+
+.searchResultCard > div:last-child {
+  color: #333;
 }
 
 .selectResult {
