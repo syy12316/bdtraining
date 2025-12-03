@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
 
 interface Option {
   id: string;
@@ -8,37 +9,22 @@ interface Option {
 }
 
 const VoteResults: React.FC = () => {
-  // 初始化时从localStorage加载投票数据
-  const [options, setOptions] = useState<Option[]>(() => {
-    const savedVotes = localStorage.getItem('votes');
-    if (savedVotes) {
-      return JSON.parse(savedVotes);
-    }
-    return [
-      { id: '1', name: '选项A', votes: 0 },
-      { id: '2', name: '选项B', votes: 0 },
-      { id: '3', name: '选项C', votes: 0 },
-    ];
-  });
+  // 从store中获取投票数据
+  const { options, isLoggedIn } = useAuthStore();
   
-  // 根据options计算总票数
-  const [totalVotes, setTotalVotes] = useState(0);
-  
-  // 当options变化时重新计算总票数
-  useEffect(() => {
-    const total = options.reduce((sum: number, option: Option) => sum + option.votes, 0);
-    setTotalVotes(total);
+  // 使用useMemo缓存总票数计算结果
+  const totalVotes = useMemo(() => {
+    return options.reduce((sum: number, option: Option) => sum + option.votes, 0);
   }, [options]);
   
   const navigate = useNavigate();
 
   useEffect(() => {
     // 检查用户是否已登录
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
     if (!isLoggedIn) {
       navigate('/login');
     }
-  }, [navigate]);
+  }, [isLoggedIn, navigate]);
 
   const handleBackToVote = () => {
     navigate('/vote');

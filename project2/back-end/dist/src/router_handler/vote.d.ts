@@ -1,0 +1,1 @@
+//# sourceMappingURL=vote.d.ts.map

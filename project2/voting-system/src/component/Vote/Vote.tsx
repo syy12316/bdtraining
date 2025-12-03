@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../store/authStore';
 
 interface Option {
   id: string;
@@ -8,48 +9,27 @@ interface Option {
 }
 
 const Vote: React.FC = () => {
-  // 初始化时从localStorage加载投票数据
-  const [options, setOptions] = useState<Option[]>(() => {
-    const savedVotes = localStorage.getItem('votes');
-    if (savedVotes) {
-      return JSON.parse(savedVotes);
-    }
-    return [
-      { id: '1', name: '选项A', votes: 0 },
-      { id: '2', name: '选项B', votes: 0 },
-      { id: '3', name: '选项C', votes: 0 },
-    ];
-  });
-  
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]); // 多选支持
-  const [error, setError] = useState('');
-  
-  // 初始化时从localStorage加载用户名
-  const [username, setUsername] = useState(() => {
-    return localStorage.getItem('username') || '';
-  });
-  
   const navigate = useNavigate();
+  const { 
+    isLoggedIn, 
+    username, 
+    hasVoted, 
+    options, 
+    selectedOptions, 
+    setSelectedOptions, 
+    submitVote 
+  } = useAuthStore();
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // 检查用户是否已登录
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-
-    // 检查用户是否已投票
-    const hasVoted = localStorage.getItem('hasVoted');
-    if (hasVoted) {
+    // 检查用户是否已登录且已投票
+    if (isLoggedIn && hasVoted) {
       navigate('/results');
     }
-  }, [navigate]);
+  }, [isLoggedIn, hasVoted, navigate]);
 
   const handleOptionChange = (optionId: string) => {
-    setSelectedOptions(prev => {
-      if (prev.includes(optionId)) {
-        return prev.filter(id => id !== optionId);
-      } else {
-        return [...prev, optionId];
-      }
-    });
+    setSelectedOptions(optionId);
   };
 
   const handleVote = () => {
@@ -58,18 +38,8 @@ const Vote: React.FC = () => {
       return;
     }
 
-    // 更新投票结果
-    const updatedOptions = options.map(option => 
-      selectedOptions.includes(option.id) 
-        ? { ...option, votes: option.votes + 1 } 
-        : option
-    );
-
-    setOptions(updatedOptions);
-    
-    // 保存投票状态和结果到localStorage
-    localStorage.setItem('hasVoted', 'true');
-    localStorage.setItem('votes', JSON.stringify(updatedOptions));
+    // 使用store提交投票
+    submitVote();
     
     // 投票成功后跳转到结果页面
     navigate('/results');
@@ -79,7 +49,7 @@ const Vote: React.FC = () => {
     navigate('/login');
   };
 
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  // 已经从store中获取了isLoggedIn状态
 
   return (
     <div className="vote-container">
@@ -88,7 +58,14 @@ const Vote: React.FC = () => {
       {/* 登录用户显示问候语 */}
       {isLoggedIn && username && (
         <div className="welcome-message">
-          您好，{username}，请投票
+          您好，
+          <span 
+            className="username-link" 
+            onClick={() => navigate('/profile')}
+            style={{ cursor: 'pointer', color: '#0066cc', textDecoration: 'underline' }}
+          >
+            {username}
+          </span>，请投票
         </div>
       )}
       
