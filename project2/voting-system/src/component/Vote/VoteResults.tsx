@@ -1,70 +1,85 @@
-import { useEffect, useMemo } from 'react';
+import React, { useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 import { useAuthStore } from '../../store/authStore';
-
-interface Option {
-  id: string;
-  name: string;
-  votes: number;
-}
+import { useVoteStore } from '../../store/voteStore';
+import type {VoteRecord} from '../../store/voteStore';
+import './VoteResults.css';
 
 const VoteResults: React.FC = () => {
-  // 从store中获取投票数据
-  const { options, isLoggedIn } = useAuthStore();
-  
-  // 使用useMemo缓存总票数计算结果
-  const totalVotes = useMemo(() => {
-    return options.reduce((sum: number, option: Option) => sum + option.votes, 0);
-  }, [options]);
-  
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuthStore();
+  const {voteRecords, setVoteRecords, updateVoteResults } = useVoteStore();
 
+  
+  // 检查用户是否已登录
   useEffect(() => {
-    // 检查用户是否已登录
     if (!isLoggedIn) {
-      navigate('/login');
+      navigate('/');
     }
   }, [isLoggedIn, navigate]);
 
-  const handleBackToVote = () => {
-    navigate('/vote');
+  // 从后端API获取投票结果
+  const fetchVoteResults = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/vote/results');
+      const result = await response.json();
+      if (result.code === 0) {
+        setVoteRecords(result.data);
+        updateVoteResults(result.data);
+      }
+    } catch (error) {
+      console.error('获取投票结果失败:', error);
+    }
   };
 
-  const calculatePercentage = (votes: number) => {
-    if (totalVotes === 0) return 0;
-    return Math.round((votes / totalVotes) * 100);
-  };
+  // 初始化WebSocket连接
+  useEffect(() => {
+    // 创建WebSocket连接
+    const newSocket = io('http://localhost:8000');
+
+    // 监听所有投票数据
+    newSocket.on('allVotes', (votes: VoteRecord[]) => {
+      console.log('接收到所有投票数据:', votes);
+      setVoteRecords(votes);
+      updateVoteResults(votes);
+    });
+
+    // 监听投票更新
+    newSocket.on('voteUpdate', (data: VoteRecord) => {
+      console.log('接收到投票更新:', data);
+      // 重新获取最新的投票结果
+      fetchVoteResults();
+    });
+
+    // 组件挂载时获取初始投票结果
+    fetchVoteResults();
+
+    return () => {
+      // 断开WebSocket连接
+      newSocket.disconnect();
+    };
+  }, [setVoteRecords, updateVoteResults]);
+
+  // // 计算总票数
+  // const totalVotes = options.reduce((sum, option) => sum + option.votes, 0);
+
+  // // 计算每个选项的百分比
+  // const calculatePercentage = (votes: number) => {
+  //   if (totalVotes === 0) return 0;
+  //   return Math.round((votes / totalVotes) * 100);
+  // };
+
+  // 格式化日期时间
+  // const formatDateTime = (dateTimeString: string) => {
+  //   const date = new Date(dateTimeString);
+  //   return date.toLocaleString('zh-CN');
+  // };
 
   return (
     <div className="results-container">
       <h2>投票结果</h2>
-      
-      <div className="results-summary">
-        <p>总票数: {totalVotes}</p>
-        <button onClick={handleBackToVote} className="back-button">
-          返回投票页面
-        </button>
-      </div>
-      
-      <div className="results-list">
-        {options.map(option => {
-          const percentage = calculatePercentage(option.votes);
-          return (
-            <div key={option.id} className="result-item">
-              <div className="result-header">
-                <span className="option-name">{option.name}</span>
-                <span className="vote-count">{option.votes} 票 ({percentage}%)</span>
-              </div>
-              <div className="progress-bar-container">
-                <div 
-                  className="progress-bar" 
-                  style={{ width: `${percentage}%` }}
-                ></div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {JSON.stringify(voteRecords, null, 2)}
     </div>
   );
 };

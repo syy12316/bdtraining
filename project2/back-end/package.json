@@ -14,6 +14,7 @@
   "dependencies": {
     "@escook/express-joi": "^1.1.1",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/socket.io": "^3.0.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -23,7 +24,8 @@
     "mongoose": "^9.0.0",
     "mysql": "^2.18.1",
     "nodeman": "^1.1.2",
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",

@@ -1,59 +1,70 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-
-interface Option {
-  id: string;
-  name: string;
-  votes: number;
-}
+import { useVoteStore } from '../../store/voteStore';
+import './Vote.css';
 
 const Vote: React.FC = () => {
   const navigate = useNavigate();
-  const { 
-    isLoggedIn, 
-    username, 
-    hasVoted, 
-    options, 
-    selectedOptions, 
-    setSelectedOptions, 
-    submitVote 
-  } = useAuthStore();
+  const { token, username, isLoggedIn } = useAuthStore();
+  const { selectedOptions, setSelectedOptions, options, hasVoted } = useVoteStore();
   const [error, setError] = useState('');
 
+  // 检查用户是否已登录且已投票
   useEffect(() => {
-    // 检查用户是否已登录且已投票
     if (isLoggedIn && hasVoted) {
-      navigate('/results');
+      navigate('/vote/results');
     }
   }, [isLoggedIn, hasVoted, navigate]);
 
-  const handleOptionChange = (optionId: string) => {
+
+
+  const handleOptionSelect = (optionId: string) => {
     setSelectedOptions(optionId);
+    setError('');
   };
 
-  const handleVote = () => {
+  const handleVote = async () => {
     if (selectedOptions.length === 0) {
       setError('请至少选择一个选项');
       return;
     }
 
-    // 使用store提交投票
-    submitVote();
-    
-    // 投票成功后跳转到结果页面
-    navigate('/results');
+    try {
+      // 向后端API提交投票
+      const response = await fetch('http://localhost:8000/api/vote/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: token,
+          username: username,
+          record: selectedOptions
+        }),
+      });
+
+      const result = await response.json();
+      if (result.code === 0) {
+        // 投票成功，跳转到结果页面
+        navigate('/vote/results');
+      } else {
+        setError(result.message || '投票失败');
+      }
+    } catch (error) {
+      console.error('投票请求失败:', error);
+      setError('投票请求失败，请稍后重试');
+    }
   };
 
   const handleLoginRedirect = () => {
     navigate('/login');
   };
 
-  // 已经从store中获取了isLoggedIn状态
-
   return (
     <div className="vote-container">
-      <h2>投票</h2>
+      <h2>投票系统</h2>
+      <h3>请选择您的选项</h3>
       
       {/* 登录用户显示问候语 */}
       {isLoggedIn && username && (
@@ -89,20 +100,25 @@ const Vote: React.FC = () => {
               id={`option-${option.id}`}
               value={option.id}
               checked={selectedOptions.includes(option.id)}
-              onChange={() => handleOptionChange(option.id)}
-              disabled={!isLoggedIn} // 未登录用户禁用选项
+              onChange={() => handleOptionSelect(option.id)}
+              disabled={!isLoggedIn || hasVoted} // 未登录或已投票用户禁用选项
             />
             <label htmlFor={`option-${option.id}`}>{option.name}</label>
           </div>
         ))}
         
-        <button 
-          onClick={handleVote} 
-          className="vote-button"
-          disabled={!isLoggedIn || selectedOptions.length === 0}
-        >
-          提交投票
-        </button>
+        <div className="button-group">
+          <button 
+            onClick={handleVote} 
+            className="vote-button"
+            disabled={!isLoggedIn || hasVoted || selectedOptions.length === 0}
+          >
+            {hasVoted ? '已投票' : '提交投票'}
+          </button>
+          <Link to="/vote/results" className="view-results-button">
+            查看结果
+          </Link>
+        </div>
       </div>
     </div>
   );

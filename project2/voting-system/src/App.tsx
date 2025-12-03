@@ -31,7 +31,7 @@ function App() {
           <Route path="/vote" element={<Vote />} />
           
           {/* 投票结果页面 - 所有用户都可以访问 */}
-          <Route path="/results" element={<VoteResults />} />
+          <Route path="/vote/results" element={<VoteResults />} />
           
           {/* 用户信息页面 */}
           <Route path="/profile" element={<UserProfile />} />
