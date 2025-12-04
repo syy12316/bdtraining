@@ -1,0 +1,9 @@
+.result-item {
+  display: flex;
+  align-items: center;
+}
+.option-name {
+  flex: 1;
+}
+.vote-count {
+  flex: 1;}

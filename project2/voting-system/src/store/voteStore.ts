@@ -36,9 +36,10 @@ interface VoteState {
 export const useVoteStore = create<VoteState>((set) => ({
   // 初始状态
   options: [
-    { id: '1', name: '选项A', votes: 0 },
-    { id: '2', name: '选项B', votes: 0 },
-    { id: '3', name: '选项C', votes: 0 },
+    { id: '1', name: '春天', votes: 0 },
+    { id: '2', name: '夏天', votes: 0 },
+    { id: '3', name: '秋天', votes: 0 },
+    { id: '4', name: '冬天', votes: 0 },
   ],
   hasVoted: false,
   selectedOptions: [],
@@ -72,7 +73,8 @@ export const useVoteStore = create<VoteState>((set) => ({
     const optionCounts: { [key: string]: number } = {
       '1': 0,
       '2': 0,
-      '3': 0
+      '3': 0,
+      '4': 0,
     };
     
     // 遍历所有投票记录，统计每个选项的票数

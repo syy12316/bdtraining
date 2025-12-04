@@ -21,10 +21,11 @@ export const initWebSocket = (server: any) => {
       const sql = 'SELECT * FROM votes';
       db.query(sql, (err, result: any[]) => {
         if (!err) {
-          // 解析record字段
+          // 解析record字段并确保voted_at是ISO字符串格式
           const votes = result.map(vote => ({
             ...vote,
-            record: JSON.parse(vote.record)
+            record: JSON.parse(vote.record),
+            voted_at: vote.voted_at instanceof Date ? vote.voted_at.toISOString() : vote.voted_at
           }));
           socket.emit('allVotes', votes);
         }
@@ -61,7 +62,8 @@ export const broadcastVoteUpdate = (data: any) => {
       if (!err) {
         const votes = result.map(vote => ({
           ...vote,
-          record: JSON.parse(vote.record)
+          record: JSON.parse(vote.record),
+          voted_at: vote.voted_at instanceof Date ? vote.voted_at.toISOString() : vote.voted_at
         }));
         io.emit('allVotes', votes);
       }

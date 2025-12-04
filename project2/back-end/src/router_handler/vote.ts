@@ -107,10 +107,11 @@ export const getVoteResults = (req: Request, res: Response) => {
         return res.status(500).json({ code: 500, msg: '服务器内部错误' });
       }
 
-      // 解析record字段 - 确保正确处理类型
+      // 解析record字段并确保voted_at是ISO字符串格式
         const votes = result.map(vote => ({
           ...vote,
-          record: typeof vote.record === 'string' ? JSON.parse(vote.record) : vote.record
+          record: typeof vote.record === 'string' ? JSON.parse(vote.record) : vote.record,
+          voted_at: vote.voted_at instanceof Date ? vote.voted_at.toISOString() : vote.voted_at
         }));
 
       res.status(200).json({
@@ -139,10 +140,11 @@ export const getUserVoteRecords = (req: Request, res: Response) => {
         return res.status(500).json({ code: 500, msg: '服务器内部错误' });
       }
 
-      // 解析record字段 - 确保正确处理类型
+      // 解析record字段并确保voted_at是ISO字符串格式
         const votes = result.map(vote => ({
           ...vote,
-          record: typeof vote.record === 'string' ? JSON.parse(vote.record) : vote.record
+          record: typeof vote.record === 'string' ? JSON.parse(vote.record) : vote.record,
+          voted_at: vote.voted_at instanceof Date ? vote.voted_at.toISOString() : vote.voted_at
         }));
 
       res.status(200).json({
