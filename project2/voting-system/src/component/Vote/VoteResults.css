@@ -60,3 +60,99 @@
   font-size: 14px;
   color: #333;
 }
+
+/* 数据统计样式 */
+.vote-statistics {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.vote-statistics h3 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.vote-statistics h4 {
+  color: #555;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.stat-label {
+  font-weight: bold;
+  color: #666;
+  margin-right: 10px;
+}
+
+.stat-value {
+  color: #4caf50;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* 排名列表样式 */
+.rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.rank-item:hover {
+  background-color: #e9e9e9;
+}
+
+.rank-number {
+  width: 30px;
+  height: 30px;
+  background-color: #4caf50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+/* 基于实际排名值显示不同颜色 */
+.rank-item [data-rank="1"] {
+  background-color: #ffd700;
+  color: #333;
+}
+
+.rank-item [data-rank="2"] {
+  background-color: #c0c0c0;
+}
+
+.rank-item [data-rank="3"] {
+  background-color: #cd7f32;
+}
+
+.rank-option {
+  flex: 1;
+  font-weight: bold;
+  color: #333;
+}
+
+.rank-votes {
+  color: #666;
+  font-size: 14px;
+}

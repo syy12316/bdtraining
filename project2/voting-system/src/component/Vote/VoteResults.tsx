@@ -1,9 +1,10 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState, useRef} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useAuthStore } from '../../store/authStore';
 import { useVoteStore } from '../../store/voteStore';
 import type {VoteRecord} from '../../store/voteStore';
+import type {Option} from '../../store/voteStore';
 import VoteChart from './VoteChart';
 import './VoteResults.css';
 import VoteRecordItem from './VoteReocrdItem';
@@ -13,6 +14,38 @@ const VoteResults: React.FC = () => {
   const { isLoggedIn } = useAuthStore();
   const {voteRecords, setVoteRecords, updateVoteResults, options } = useVoteStore();
   const [chartType, setChartType] = useState<'pie' | 'bar'>('pie');
+  const [rankedOptions, setRankedOptions] = useState<(Option & { rank: number })[]>([]);
+  const workerRef = useRef<Worker | null>(null);
+  
+  // 初始化Web Worker
+  useEffect(() => {
+    // 创建Web Worker
+    workerRef.current = new Worker(new URL('../../worker/voteRankWorker.ts', import.meta.url), { type: 'module' });
+    
+    // 处理Worker返回的结果
+    workerRef.current.onmessage = (event: MessageEvent) => {
+      if (event.data.type === 'RANKINGS_RESULT') {
+        setRankedOptions(event.data.data);
+      }
+    };
+    
+    // 清理函数
+    return () => {
+      if (workerRef.current) {
+        workerRef.current.terminate();
+      }
+    };
+  }, []);
+  
+  // 当投票选项数据变化时，使用Web Worker计算排名
+  useEffect(() => {
+    if (workerRef.current && options.length > 0) {
+      workerRef.current.postMessage({
+        type: 'CALCULATE_RANKINGS',
+        data: options
+      });
+    }
+  }, [options]);
 
   // 从后端API获取投票结果
   const fetchVoteResults = async () => {
@@ -98,11 +131,33 @@ const VoteResults: React.FC = () => {
         title="投票结果统计"
       />
       
+      {/* 数据统计区域 */}
+      <div className="vote-statistics">
+        <h3>数据统计</h3>
+        <div className="stat-item">
+          <span className="stat-label">已投票人数：</span>
+          <span className="stat-value">{voteRecords.length}</span>
+        </div>
+        
+        <h4>选项排名</h4>
+        {rankedOptions.length > 0 ? (
+          <div className="rank-list">
+            {rankedOptions.map((option) => (
+              <div key={option.id} className="rank-item">
+                <div className="rank-number" data-rank={option.rank}>{option.rank}</div>
+                <div className="rank-option">{option.name}</div>
+                <div className="rank-votes">{option.votes} 票</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div>暂无排名数据</div>
+        )}
+      </div>
+      
       {/* 投票记录列表 */}
       <div className="vote-records">
         <h3>投票记录</h3>
-        {/*数据统计：几人已投票，各选项的投票排名*/}
-        
         {voteRecords.length > 0 ? (
           voteRecords.map((record, index) => (
             <VoteRecordItem key={index} voteRecord={record} />
