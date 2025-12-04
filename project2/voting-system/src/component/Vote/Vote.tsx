@@ -7,7 +7,7 @@ import './Vote.css';
 const Vote: React.FC = () => {
   const navigate = useNavigate();
   const { token, username, isLoggedIn } = useAuthStore();
-  const { selectedOptions, setSelectedOptions, options, hasVoted } = useVoteStore();
+  const { selectedOptions, setSelectedOptions, options, hasVoted, setVoteRecords, setUserVoteRecord, resetVote } = useVoteStore();
   const [error, setError] = useState('');
 
   // 检查用户是否已登录且已投票
@@ -16,6 +16,26 @@ const Vote: React.FC = () => {
       navigate('/vote/results');
     }
   }, [isLoggedIn, hasVoted, navigate]);
+
+  // 当用户登录状态变化时，加载用户的投票记录
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      // 首先获取最新的投票记录
+      fetch('http://localhost:8000/api/vote/results')
+        .then(response => response.json())
+        .then(data => {
+          if (data.code === 0) {
+            setVoteRecords(data.data);
+            // 设置用户的投票记录
+            setUserVoteRecord(token);
+          }
+        })
+        .catch(error => console.error('获取投票记录失败:', error));
+    } else {
+      // 用户未登录时，重置投票选项
+      resetVote();
+    }
+  }, [isLoggedIn, token, setVoteRecords, setUserVoteRecord, resetVote]);
 
 
 

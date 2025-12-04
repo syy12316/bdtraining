@@ -15,6 +15,17 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // 前端校验
+    if (username.length < 1 || username.length > 10) {
+      setError('用户名长度必须在1-10个字符之间');
+      return;
+    }
+    if (password.length < 6 || password.length > 12) {
+      setError('密码长度必须在6-12个字符之间');
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -50,6 +61,17 @@ const Login: React.FC = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // 前端校验
+    if (username.length < 1 || username.length > 10) {
+      setError('用户名长度必须在1-10个字符之间');
+      return;
+    }
+    if (password.length < 6 || password.length > 12) {
+      setError('密码长度必须在6-12个字符之间');
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -97,9 +119,12 @@ const Login: React.FC = () => {
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            minLength={1}
+            maxLength={10}
             required
             disabled={loading}
           />
+          <small className="form-hint">请输入1-10个字符</small>
         </div>
         <div className="form-group">
           <label htmlFor="password">密码：</label>
@@ -108,9 +133,12 @@ const Login: React.FC = () => {
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={6}
+            maxLength={12}
             required
             disabled={loading}
           />
+          <small className="form-hint">请输入6-12个字符</small>
         </div>
         {error && <div className="error-message">{error}</div>}
         <button type="submit" className="login-button" disabled={loading}>

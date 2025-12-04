@@ -28,6 +28,7 @@ interface VoteState {
   setSelectedOptions: (optionId: string) => void;
   resetVote: () => void;
   setVoteRecords: (records: VoteRecord[]) => void;
+  setUserVoteRecord: (userId: string) => void;
   updateVoteResults: (votes: VoteRecord[]) => void;
   checkIfVoted: (userId: string) => void;
 }
@@ -100,4 +101,19 @@ export const useVoteStore = create<VoteState>((set) => ({
     const hasVoted = state.voteRecords.some(record => record.user_id === userId);
     return { hasVoted };
   }),
+
+  // 设置用户的投票记录
+  setUserVoteRecord: (userId: string) => set((state) => {
+    const userRecord = state.voteRecords.find(record => record.user_id === userId);
+    if (userRecord) {
+      return {
+        selectedOptions: userRecord.record,
+        hasVoted: true
+      };
+    }
+    return {
+      selectedOptions: [],
+      hasVoted: false
+    };
+  })
 }));
